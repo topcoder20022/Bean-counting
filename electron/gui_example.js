@@ -20,6 +20,7 @@ async function start_count(speed, size, flag) {
         pythonProcess.stdout.on('data', (data) => {
             var qa_result = JSON.parse(data.toString());
             result = qa_result.count;
+            console.log("===========", result)
             resolve('done');
         });
         pythonProcess.stderr.on('data', (data) => {
@@ -29,6 +30,39 @@ async function start_count(speed, size, flag) {
     });
     return result;
     
+}
+
+// click calibration btn
+async function calibration(evt) {
+    document.getElementById("setting_container").style.display = 'none';
+    document.getElementById("main_container").style.display = 'block';
+    var elem_start = document.getElementById("btn_start");
+    var elem_reset = document.getElementById("btn_reset");
+    var elem_setting = document.getElementById("btn_setting");
+    var elem_count_result = document.getElementById("h_count_result");
+    var elem_v_speed = document.getElementById("v_speed");
+    var elem_v_size = document.getElementById("v_size");
+    // click start button
+    // inactive contine
+    elem_start.value = "Continue";
+    elem_start.style.background = 'rgb(122, 136, 142)';
+    elem_start.disabled = true;
+    elem_start.style.cursor="default";
+    // active stop
+    elem_reset.value = "Stop";
+    elem_reset.style.background = 'rgb(26, 22, 45)';
+    elem_reset.disabled = false;
+    elem_reset.style.cursor="pointer";
+    // inactive setting
+    elem_setting.style.background = 'url(../img/setting_btn_disabled.png)';
+    elem_setting.style.pointerEvents = 'none';
+
+    // call python counting function
+    v_speed = elem_v_speed.value;
+    v_size = elem_v_size.value;
+    count = await start_count(v_speed, v_size, 'start');
+    console.log("-----count------", count)
+    elem_count_result.innerHTML = count;
 }
 
 // click start&continue btn
@@ -101,8 +135,8 @@ function reset_stop(evt) {
         elem_start.disabled = false;
         elem_start.style.cursor="pointer";
 
-        // elem_setting.style.background = 'url(../img/setting_btn.png)';
-        // elem_setting.style.pointerEvents = 'auto';
+        elem_setting.style.background = 'url(../img/setting_btn.png)';
+        elem_setting.style.pointerEvents = 'auto';
     }
     // click reset button
     else if (elem_reset.value == "Reset") {
@@ -140,5 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("btn_reset").addEventListener("click", reset_stop);
     document.getElementById("btn_setting").addEventListener("click", setting);
     document.getElementById("btn_backarrow").addEventListener("click", back_to_main);
+    document.getElementById("btn_calibration").addEventListener("click", calibration);
 
 });

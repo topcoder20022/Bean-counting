@@ -37,17 +37,17 @@ def img_preprocessing(img):
     # gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     # img = gray
     # ret, thresh = cv2.threshold(gray,180,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-    ret, thresh = cv2.threshold(img,160,255,cv2.THRESH_BINARY_INV)
+    ret, thresh = cv2.threshold(img,180,255,cv2.THRESH_BINARY_INV)
 
     thresh = 255 - thresh
     # noise removal
     kernel = np.ones((3,3),np.uint8)
     opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 2)
     # sure background area
-    sure_bg = cv2.dilate(opening,kernel,iterations=1)
+    sure_bg = cv2.dilate(opening,kernel,iterations=2)
     # Finding sure foreground area
     dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
-    ret, sure_fg = cv2.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+    ret, sure_fg = cv2.threshold(dist_transform,0.3*dist_transform.max(),255,0)
     # Finding unknown region
     sure_fg = np.uint8(sure_fg)
     # cv2.imwrite("frames/" + str(i) + "__.jpg", fg)
@@ -74,10 +74,10 @@ def main():
     while ret:
         ret, frame = camera.read()
         if i % 9 == 0:    
-            offset = 53
+            offset = 60
             y1 = [0, 0 + offset]
-            y2 = [200, 200 + 24 + offset]
-            y3 = [400, 400 + 40 + offset]
+            y2 = [200, 200 + 20 + offset]
+            y3 = [400, 400 + 35 + offset]
             y4 = [600, 600 + 40 + offset]
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -90,8 +90,7 @@ def main():
                     sure_bg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             for c in contours:
                 x, y, w, h = cv2.boundingRect(c)
-                # if w < int(frame.shape[1]/rate) and h < int(frame.shape[0]/rate):
-                if w < 50 and h < 50:
+                if w < int(frame.shape[1]/rate) and h < int(frame.shape[0]/rate):
                     if y > y1[0] and y < y1[1]:
                         if w > mw and h <= mh:
                             count_in_area = int(w / mw) + 1
@@ -149,10 +148,10 @@ def main():
                         else:
                             count4 += 1
         if i % 10 == 0: 
-            offset = 77
+            offset = 82
             y1 = [0, 0 + offset]
-            y2 = [200, 200 + 19 + offset]
-            y3 = [400, 400 + 30 + offset]
+            y2 = [200, 200 + 30 + offset]
+            y3 = [400, 400 + 40 + offset]
             y4 = [600, 600 + 40 + offset]
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -167,16 +166,15 @@ def main():
                     sure_bg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             # print("=======", i, len(contours))
             # if i == 80:
-            ccs = []
+            cv2.drawContours(resize, contours, -1, (0, 255, 0), 3)
+            cv2.imshow("Counting...", resize)
             for c in contours:
                 x, y, w, h = cv2.boundingRect(c)
-                # if w < int(frame.shape[1]/rate) and h < int(frame.shape[0]/rate):
-                if w < 50 and h < 50:
-                    ccs.append(c)
+                if w < int(frame.shape[1]/rate) and h < int(frame.shape[0]/rate):
                     # print(w, h)
-                    # img = cv2.rectangle(sure_bg, (x, y), (x+w, y+h),(0, 255, 0), 5)
+                    img = cv2.rectangle(sure_bg, (x, y), (x+w, y+h),(0, 255, 0), 5)
                     # # cv2.imshow("rect", img)
-                    # cv2.imshow("rect1", sure_bg)
+                    # cv2.imshow("Counting...", sure_bg)
                     # cv2.waitKey(0)
                     if y > y1[0] and y < y1[1]:
                         if w > mw and h <= mh:
@@ -234,15 +232,12 @@ def main():
                             count8 += count_in_area
                         else:
                             count8 += 1
-            cv2.drawContours(resize, ccs, -1, (0, 255, 0), 3)
-            cv2.imshow("Counting...", resize)
-            # cv2.imwrite(str(i) + ".jpg", resize)
 
         if i % 11 == 0:    
-            offset = 76
+            offset = 89
             y1 = [0, 0 + offset]
-            y2 = [200, 200 + 3 + offset]
-            y3 = [400, 400 + 34 + offset]
+            y2 = [200, 200 + 10 + offset]
+            y3 = [400, 400 + 35 + offset]
             y4 = [600, 600 + 40 + offset]
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -256,8 +251,7 @@ def main():
             # if i == 220:
             for c in contours:
                 x, y, w, h = cv2.boundingRect(c)
-                # if w < int(frame.shape[1]/rate) and h < int(frame.shape[0]/rate):
-                if w < 50 and h < 50:
+                if w < int(frame.shape[1]/rate) and h < int(frame.shape[0]/rate):
                     # print(w, h)
                     # img = cv2.rectangle(sure_bg, (x, y), (x+w, y+h),(0, 255, 0), 5)
                     # cv2.imshow("rect", img)
