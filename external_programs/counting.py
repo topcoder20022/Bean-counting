@@ -4,9 +4,10 @@ import statistics
 import time
 import sys
 # camera = cv2.VideoCapture(0)  # init the camera
-camera = cv2.VideoCapture("./external_programs/100_fast_1.mp4")
+camera = cv2.VideoCapture("100_fast_1.mp4")
 
-size = int(sys.argv[2])
+# size = int(sys.argv[2])
+size = 22
 mw = size
 mh = size + 1
 marea = mw * mh
@@ -81,7 +82,8 @@ def main():
             y4 = [600, 600 + 40 + offset]
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-            resize = cv2.resize(frame, (int(frame.shape[1]/rate), int(frame.shape[0]/rate)))  # resize the frame
+            # resize = cv2.resize(frame, (int(frame.shape[1]/rate), int(frame.shape[0]/rate)))  # resize the frame
+            resize = cv2.resize(frame, (480, 848))  # resize the frame
             gray = cv2.cvtColor(resize, cv2.COLOR_BGR2GRAY)
             # cv2.imshow('frame',gray)
             (thresh, sure_fg, sure_bg) = img_preprocessing(gray)

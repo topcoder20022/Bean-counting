@@ -3,7 +3,6 @@ import numpy as np
 import statistics
 import time
 import sys
-
 # camera = cv2.VideoCapture(0)  # init the camera
 camera = cv2.VideoCapture("./external_programs/100_fast_1.mp4")
 resolution = (480, 848)
@@ -15,6 +14,27 @@ mh = size + 1
 marea = mw * mh
 rate = 1
 
+# print("max_area:::", marea)
+
+def img_preprocessing1(img):
+    # gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    # img = gray
+    # ret, thresh = cv2.threshold(gray,180,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    ret, thresh = cv2.threshold(img,130,255,cv2.THRESH_BINARY_INV)
+
+    thresh = 255 - thresh
+    # noise removal
+    kernel = np.ones((1,1),np.uint8)
+    opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 2)
+    # sure background area
+    sure_bg = cv2.dilate(opening,kernel,iterations=4)
+    # Finding sure foreground area
+    dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
+    ret, sure_fg = cv2.threshold(dist_transform,0.3*dist_transform.max(),255,0)
+    # Finding unknown region
+    sure_fg = np.uint8(sure_fg)
+    # cv2.imwrite("frames/" + str(i) + "__.jpg", fg)
+    return thresh, sure_fg, sure_bg
 
 def img_preprocessing(img):
     # gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -59,6 +79,11 @@ def main():
     areas = []
 
     while ret:
+        # line = sys.stdin.readline()
+        # if line == "terminate":
+        #     my_print('I got a terminate request from electron (js)...terminating')
+        #     exit(0)
+        # else:
         ret, frame = camera.read()
         if i % 9 == 0:    
             offset = 53
@@ -308,14 +333,15 @@ def main():
                         else:
                             count12 += 1
         i += 1
-        # counts = [count1, count2, count3, count4, count5, count6, count7, count8, count9, count10, count11, count12]
-        counts = [count1, count2, count3, count5, count6, count7, count9, count10, count11]
-        counts_9 = [count1, count2, count3]
-        counts_10 = [count5, count6, count7]
-        counts_11 = [count9, count10, count11]
-        result = int(statistics.mean(counts))
-        print (result)
-        sys.stdout.flush()
+    # counts = [count1, count2, count3, count4, count5, count6, count7, count8, count9, count10, count11, count12]
+    counts = [count1, count2, count3, count5, count6, count7, count9, count10, count11]
+    counts_9 = [count1, count2, count3]
+    counts_10 = [count5, count6, count7]
+    counts_11 = [count9, count10, count11]
+    result = int(statistics.mean(counts))
+    result = '{"count": "' + str(result) +'"}';
+    print (result)
+    sys.stdout.flush()
 
 if __name__ == '__main__':
     main()

@@ -5,6 +5,8 @@ const path = require('path')
 var nodeConsole = require('console');
 var my_console = new nodeConsole.Console(process.stdout, process.stderr);
 var child;
+process.env.GH_TOKEN = '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';
+
 
 function print_both(str) {
     console.log('main.js:    ' + str);
